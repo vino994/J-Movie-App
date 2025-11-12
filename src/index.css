@@ -1,39 +1,44 @@
+/* ✅ All @imports must come first */
+@import url("https://fonts.googleapis.com/css2?family=Sirin+Stencil&display=swap");
 @import "tailwindcss";
 
-@layer base {
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: 'Inter', sans-serif;
-    background: linear-gradient(145deg, #1a1a1a, #000);
-    color: white;
-    transition: all 0.4s ease;
-  }
-
-  body.light {
-    background: #f4f4f4;
-    color: #1a1a1a;
-  }
+/* ✅ Global Font */
+* {
+  font-family: "Sirin Stencil", sans-serif;
+  letter-spacing: 0.5px;
 }
 
-/* 🧊 Glassmorphism Utility Classes */
-@layer utilities {
-  .bg-glass {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-  }
-
-  .text-glass {
-    color: rgba(255, 255, 255, 0.9);
-  }
-
-  .border-glass {
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
+/* ✅ Base Theme */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: linear-gradient(145deg, #1a1a1a, #000);
+  color: white;
+  transition: all 0.4s ease;
 }
-/* Hide horizontal scrollbars for smooth Netflix-style rows */
+
+body.light {
+  background: #f4f4f4;
+  color: #1a1a1a;
+}
+
+/* 🧊 Glassmorphism */
+.bg-glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.text-glass {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.border-glass {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -41,3 +46,4 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+

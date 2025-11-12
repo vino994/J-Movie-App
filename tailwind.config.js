@@ -1,3 +1,4 @@
+/** @type {import('tailwindcss').Config} */
 export default {
   darkMode: "class",
   content: ["./index.html", "./src/**/*.{js,jsx}"],
@@ -9,6 +10,9 @@ export default {
         accent: "#6BA4FF", // Prime blue
         glass: "rgba(255,255,255,0.08)",
         lightBg: "#F8F9FB",
+      },
+      fontFamily: {
+        stencil: ['"Sirin Stencil"', "sans-serif"],
       },
       backdropBlur: {
         xs: "2px",

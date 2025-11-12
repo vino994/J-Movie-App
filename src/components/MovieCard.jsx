@@ -1,24 +1,28 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import RatingStars from "./RatingStars";
 
 export default function MovieCard({ movie }) {
-  if (!movie || !movie.imdbID) return null;
+  const navigate = useNavigate();
 
   return (
-    <div className="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden hover:scale-105 transition-transform duration-300 shadow-lg">
+    <div
+      onClick={() => navigate(`/movie/${movie.imdbID}`, { state: movie })}
+      className="cursor-pointer group bg-white/10 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden shadow-md hover:shadow-pink-400/40 hover:scale-105 transition-all duration-300"
+    >
       <img
-        src={movie.Poster !== "N/A" ? movie.Poster : "https://via.placeholder.com/300x450"}
+        src={
+          movie.Poster !== "N/A"
+            ? movie.Poster
+            : "https://via.placeholder.com/300x450?text=No+Image"
+        }
         alt={movie.Title}
-        className="w-full h-80 object-cover"
+        className="w-full h-72 object-cover group-hover:opacity-90 transition"
       />
-      <div className="p-3 text-white">
-        <h3 className="font-semibold text-lg truncate mb-1">{movie.Title}</h3>
-        <p className="text-sm text-gray-400">{movie.Year}</p>
-        <RatingStars movieId={movie.imdbID} /> {/* ⭐ new */}
-        <Link to={`/movie/${movie.imdbID}`} className="text-blue-400 hover:underline text-sm">
-          View Details →
-        </Link>
+      <div className="p-3 text-left">
+        <h3 className="text-lg font-semibold truncate">{movie.Title}</h3>
+        <p className="text-sm text-gray-300 mb-2">{movie.Year}</p>
+        <RatingStars movieId={movie.imdbID} />
       </div>
     </div>
   );

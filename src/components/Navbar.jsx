@@ -65,7 +65,7 @@ export default function Navbar() {
         to="/"
         className="text-2xl font-bold tracking-wide hover:text-[#6BA4FF] transition"
       >
-        🎬 J Movies
+        🎬 J FIX
       </Link>
 
       {/* ✅ Desktop Menu */}

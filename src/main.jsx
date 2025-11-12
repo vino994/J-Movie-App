@@ -9,11 +9,11 @@ import { FilterProvider } from "./context/FilterContext"; // ✅ new
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
-      <ThemeProvider>
+     
         <FilterProvider>
           <App />
         </FilterProvider>
-      </ThemeProvider>
+     
     </BrowserRouter>
   </React.StrictMode>
 );

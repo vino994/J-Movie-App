@@ -1,21 +1,52 @@
+// src/api/omdb.js
 const API_KEY = import.meta.env.VITE_OMDB_API_KEY;
 const BASE_URL = "https://www.omdbapi.com/";
 
-export async function searchMovies(query = "Avengers", page = 1, type = "") {
-  const url = `${BASE_URL}?apikey=${API_KEY}&s=${encodeURIComponent(query)}&page=${page}${
-    type ? `&type=${type}` : ""
-  }`;
-  const res = await fetch(url);
-  const data = await res.json();
+const cache = new Map(); // simple in-memory cache
 
-  if (data.Response === "False") throw new Error(data.Error || "No results found");
-  return data;
+export async function searchMovies(query, page = 1, type = "", year = "") {
+  if (!query) return { Search: [] }; // consistent return
+
+  const key = `${query}-${page}-${type}-${year}`;
+  if (cache.has(key)) return cache.get(key);
+
+  try {
+    const url = new URL(BASE_URL);
+    url.searchParams.set("apikey", API_KEY);
+    url.searchParams.set("s", query);
+    url.searchParams.set("page", page);
+    if (type && type !== "all") url.searchParams.set("type", type);
+    if (year) url.searchParams.set("y", year);
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+
+    const data = await response.json();
+    if (data.Response === "False") return { Search: [] };
+
+    cache.set(key, data);
+    return data;
+  } catch (error) {
+    console.error("OMDb fetch error:", error);
+    return { Search: [] };
+  }
 }
 
 export async function getMovieDetails(id) {
-  const res = await fetch(`${BASE_URL}?apikey=${API_KEY}&i=${id}&plot=full`);
-  const data = await res.json();
+  if (!id) return null;
 
-  if (data.Response === "False") throw new Error(data.Error || "Movie not found");
-  return data;
+  const key = `details-${id}`;
+  if (cache.has(key)) return cache.get(key);
+
+  try {
+    const response = await fetch(`${BASE_URL}?apikey=${API_KEY}&i=${id}&plot=full`);
+    if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+
+    const data = await response.json();
+    cache.set(key, data);
+    return data;
+  } catch (error) {
+    console.error("OMDb details error:", error);
+    return null;
+  }
 }

@@ -7,7 +7,7 @@ import MoviesPage from "./pages/MoviesPage";
 import SeriesPage from "./pages/SeriesPage";
 import ShowsPage from "./pages/ShowsPage";
 import MovieDetailPage from "./pages/MovieDetailPage";
-
+import Footer from "./components/Footer";
 export default function App() {
   return (
     <>
@@ -18,8 +18,11 @@ export default function App() {
         <Route path="/movies" element={<MoviesPage />} />
         <Route path="/series" element={<SeriesPage />} />
         <Route path="/shows" element={<ShowsPage />} />
+        {/* ✅ Fixed: Use correct component name and consistent param */}
         <Route path="/movie/:id" element={<MovieDetailPage />} />
+
       </Routes>
+       <Footer />
     </>
   );
 }
