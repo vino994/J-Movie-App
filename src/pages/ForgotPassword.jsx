@@ -7,17 +7,31 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMessage("");
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setMessage("");
 
-    try {
-      const { data } = await api.post("/forgot-password", { email });
-      setMessage(data.message || "Reset link sent to your email");
-    } catch {
-      setMessage("Email not found");
-    }
-  };
+  console.log("Form submitted");
+  console.log("API Base URL:", api.defaults.baseURL);
+
+  try {
+    console.log("Sending POST request...");
+    const res = await api.post("/forgot-password", { email });
+
+    console.log("Response received:", res.data);
+
+    alert("Reset link sent!");
+    setMessage(res.data.msg || "Reset link sent to your email");
+  } catch (err) {
+    console.log("Error occurred:", err);
+    console.log("Axios error response:", err.response?.data);
+
+    alert("Error: " + (err.response?.data?.msg || "Request failed"));
+    setMessage("Email not found");
+  }
+};
+
+
 
   return (
     <AuthBackground>
@@ -37,9 +51,10 @@ export default function ForgotPassword() {
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <button className="w-full bg-red-600 py-3 rounded hover:bg-red-700 font-bold">
-          Send Reset Link
-        </button>
+       <button type="submit" className="w-full bg-red-600 py-3 rounded hover:bg-red-700 font-bold">
+  Send Reset Link
+</button>
+
 
         <p className="text-center mt-4 text-sm">
           <Link to="/login" className="text-blue-400">⬅ Back to Login</Link>
