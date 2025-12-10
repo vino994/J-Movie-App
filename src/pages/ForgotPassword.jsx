@@ -15,6 +15,17 @@ const handleSubmit = async (e) => {
   console.log("API Base URL:", api.defaults.baseURL);
 
   try {
+
+    // 1. Wake backend (Render free plan sleep issue)
+    await fetch("https://authen-eytd.onrender.com/api/auth/test")
+      .catch(() => console.log("Wake server failed (normal)"));
+
+    console.log("Server wake attempted");
+
+    // 2. Give 1 second delay to fully wake
+    await new Promise(res => setTimeout(res, 1200));
+
+    // 3. Now send actual request
     console.log("Sending POST request...");
     const res = await api.post("/forgot-password", { email });
 
@@ -22,9 +33,10 @@ const handleSubmit = async (e) => {
 
     alert("Reset link sent!");
     setMessage(res.data.msg || "Reset link sent to your email");
+
   } catch (err) {
     console.log("Error occurred:", err);
-    console.log("Axios error response:", err.response?.data);
+    console.log("Axios error:", err.response?.data);
 
     alert("Error: " + (err.response?.data?.msg || "Request failed"));
     setMessage("Email not found");
