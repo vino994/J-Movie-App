@@ -2,36 +2,48 @@ import React, { useState } from "react";
 import { api } from "../api/auth";
 import { Link, useNavigate } from "react-router-dom";
 import AuthBackground from "../components/AuthBackground";
+import Loader from "../components/Loader";
+import Popup from "../components/Popup";
 
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [popup, setPopup] = useState({ message: "", type: "" });
 
   const navigate = useNavigate();
 
+  const showPopup = (msg, type) => {
+    setPopup({ message: msg, type });
+    setTimeout(() => setPopup({ message: "", type: "" }), 2000);
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
-    setError("");
+    setLoading(true);
 
     try {
       await api.post("/register", { name, email, password });
-      navigate("/login");
+
+      showPopup("Registered successfully!", "success");
+      setTimeout(() => navigate("/login"), 2000);
+
     } catch {
-      setError("User already exists");
+      showPopup("User already exists", "error");
     }
+
+    setLoading(false);
   };
 
   return (
     <AuthBackground>
-      <form
-        onSubmit={handleRegister}
-        className="bg-black/70 p-10 rounded-xl w-80 shadow-xl"
-      >
-        <h1 className="text-3xl mb-4 font-bold text-center">Register</h1>
+      <Popup message={popup.message} type={popup.type} />
 
-        {error && <p className="text-red-400 text-sm mb-3 text-center">{error}</p>}
+      <form onSubmit={handleRegister}
+        className="bg-black/70 p-10 rounded-xl w-80 shadow-xl">
+
+        <h1 className="text-3xl mb-4 font-bold text-center">Register</h1>
 
         <input
           type="text"
@@ -57,8 +69,11 @@ export default function Register() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button className="w-full bg-red-600 py-3 rounded mt-3 hover:bg-red-700 font-bold">
-          Register
+        <button
+          disabled={loading}
+          className="w-full bg-red-600 py-3 rounded mt-3 hover:bg-red-700 font-bold flex justify-center"
+        >
+          {loading ? <Loader /> : "Register"}
         </button>
 
         <p className="text-center mt-4 text-sm">

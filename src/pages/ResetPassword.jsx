@@ -2,29 +2,42 @@ import React, { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { resetPasswordApi } from "../api/auth";
 import AuthBackground from "../components/AuthBackground";
+import Loader from "../components/Loader";
+import Popup from "../components/Popup";
 
 export default function ResetPassword() {
   const { token } = useParams();
   const navigate = useNavigate();
 
   const [password, setPassword] = useState("");
-  const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [popup, setPopup] = useState({ message: "", type: "" });
+
+  const showPopup = (msg, type) => {
+    setPopup({ message: msg, type });
+    setTimeout(() => setPopup({ message: "", type: "" }), 2000);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMsg("");
+    setLoading(true);
 
     try {
-      const { data } = await resetPasswordApi(token, { password });
-      setMsg("Password reset successful! Redirecting to login...");
+      await resetPasswordApi(token, { password });
+      showPopup("Password reset successful!", "success");
+
       setTimeout(() => navigate("/login"), 2000);
     } catch {
-      setMsg("Invalid or expired link");
+      showPopup("Invalid or expired link", "error");
     }
+
+    setLoading(false);
   };
 
   return (
     <AuthBackground>
+      <Popup message={popup.message} type={popup.type} />
+
       <form
         onSubmit={handleSubmit}
         className="bg-black/70 p-10 rounded-xl w-80 shadow-xl"
@@ -32,8 +45,6 @@ export default function ResetPassword() {
         <h2 className="text-2xl font-bold mb-4 text-center">
           Reset Password
         </h2>
-
-        {msg && <p className="text-green-400 text-sm mb-3 text-center">{msg}</p>}
 
         <input
           type="password"
@@ -43,8 +54,11 @@ export default function ResetPassword() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button className="w-full bg-red-600 py-3 rounded hover:bg-red-700 font-bold">
-          Reset Password
+        <button
+          disabled={loading}
+          className="w-full bg-red-600 py-3 rounded hover:bg-red-700 font-bold flex justify-center"
+        >
+          {loading ? <Loader /> : "Reset Password"}
         </button>
 
         <p className="text-center mt-4 text-sm">

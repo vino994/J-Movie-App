@@ -2,58 +2,59 @@ import React, { useState } from "react";
 import { api } from "../api/auth";
 import { Link } from "react-router-dom";
 import AuthBackground from "../components/AuthBackground";
+import Loader from "../components/Loader";
+import Popup from "../components/Popup";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [popup, setPopup] = useState({ message: "", type: "" });
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setMessage("");
+  const showPopup = (msg, type = "success") => {
+    setPopup({ message: msg, type });
+    setTimeout(() => setPopup({ message: "", type: "" }), 2000);
+  };
 
-  console.log("Form submitted");
-  console.log("API Base URL:", api.defaults.baseURL);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-  try {
+    try {
+      // Wake server
+      await fetch("https://authen-eytd.onrender.com/api/auth/test")
+        .catch(() => {});
 
-    // 1. Wake backend (Render free plan sleep issue)
-    await fetch("https://authen-eytd.onrender.com/api/auth/test")
-      .catch(() => console.log("Wake server failed (normal)"));
+      // Give time to wake
+      await new Promise(res => setTimeout(res, 1800));
 
-    console.log("Server wake attempted");
+      // Actual request
+      const res = await api.post("/forgot-password", { 
+        email: email.toLowerCase()  // IMPORTANT FIX
+      });
 
-    // 2. Give 1 second delay to fully wake
-    await new Promise(res => setTimeout(res, 1200));
+      console.log("Response:", res.data);
+      showPopup("Reset link sent!", "success");
 
-    // 3. Now send actual request
-    console.log("Sending POST request...");
-    const res = await api.post("/forgot-password", { email });
+    } catch (err) {
+      console.log("ERR:", err.response?.data);  // FIXED POSITION
 
-    console.log("Response received:", res.data);
+      showPopup(
+        err.response?.data?.msg || "Email not found",
+        "error"
+      );
+    }
 
-    alert("Reset link sent!");
-    setMessage(res.data.msg || "Reset link sent to your email");
-
-  } catch (err) {
-    console.log("Error occurred:", err);
-    console.log("Axios error:", err.response?.data);
-
-    alert("Error: " + (err.response?.data?.msg || "Request failed"));
-    setMessage("Email not found");
-  }
-};
-
-
+    setLoading(false);
+  };
 
   return (
     <AuthBackground>
-      <form
-        onSubmit={handleSubmit}
-        className="bg-black/70 p-10 rounded-xl w-80 shadow-xl"
-      >
-        <h2 className="text-2xl font-bold mb-4 text-center">Forgot Password</h2>
+      <Popup message={popup.message} type={popup.type} />
 
-        {message && <p className="text-green-400 text-sm mb-3 text-center">{message}</p>}
+      <form onSubmit={handleSubmit}
+        className="bg-black/70 p-10 rounded-xl w-80 shadow-xl">
+
+        <h2 className="text-2xl font-bold mb-4 text-center">Forgot Password</h2>
 
         <input
           type="email"
@@ -63,10 +64,13 @@ const handleSubmit = async (e) => {
           onChange={(e) => setEmail(e.target.value)}
         />
 
-       <button type="submit" className="w-full bg-red-600 py-3 rounded hover:bg-red-700 font-bold">
-  Send Reset Link
-</button>
-
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-red-600 py-3 rounded hover:bg-red-700 font-bold flex justify-center"
+        >
+          {loading ? <Loader /> : "Send Reset Link"}
+        </button>
 
         <p className="text-center mt-4 text-sm">
           <Link to="/login" className="text-blue-400">⬅ Back to Login</Link>
